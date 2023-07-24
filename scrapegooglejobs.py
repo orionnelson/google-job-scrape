@@ -1,4 +1,5 @@
 import csv
+import os
 import pyperclip
 import pandas as pd
 from time import sleep
@@ -136,7 +137,11 @@ class GoogleJobsScraper:
         return pyperclip.paste()
     
     def output_to_csv(self, jobtitle,jobs):
-        new_filename = f"{'_'.join(jobtitle.split())}.csv"
+        #Make results folder if it does not exist
+        results_folder = os.path.join(os.path.dirname(__file__),'results')
+        if not os.path.exists(results_folder):
+            os.mkdir('results')
+        new_filename = os.path.join(results_folder,f"{'_'.join(jobtitle.split())}.csv")
         with open(new_filename, 'w', newline='', encoding='utf-8', errors='ignore') as csvfile:
             fieldnames = ['Job Title', 'Company', 'Location', 'Via', 'Age', 'Time', 'Link']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -161,7 +166,14 @@ class GoogleJobsScraper:
 if __name__ == '__main__':
     while True:
         jobtitle = input('Enter job title: ')
-        scraper = GoogleJobsScraper(jobtitle)
-        jobs = scraper.fetch_jobs()
-        scraper.output_to_csv(jobtitle,jobs)
+        if jobtitle == "text":
+            with open("Positions.txt", "r", encoding='utf-8',errors='ignore') as f:
+                for listing in f.readlines():
+                    scraper = GoogleJobsScraper(listing)
+                    jobs = scraper.fetch_jobs()
+                    scraper.output_to_csv(listing,jobs)
+        else:
+            scraper = GoogleJobsScraper(jobtitle)
+            jobs = scraper.fetch_jobs()
+            scraper.output_to_csv(jobtitle,jobs)
         #scraper.close_browser()
