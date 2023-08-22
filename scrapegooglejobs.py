@@ -6,6 +6,7 @@ from time import sleep
 from selenium import webdriver  # automate web browser interaction from Python
 from selenium.webdriver.common.keys import Keys  # refer to keyboard key presses i.e. Keys.RETURN = 'Enter' on keyboard
 from selenium.webdriver.common.by import By  # refer to elements by their tag name
+from combineresults import combine_csv_to_excel
 
 class JobListing:
     def __init__(self, *args, **kwargs):
@@ -172,8 +173,13 @@ if __name__ == '__main__':
                     scraper = GoogleJobsScraper(listing)
                     jobs = scraper.fetch_jobs()
                     scraper.output_to_csv(listing,jobs)
+            combine_csv_to_excel(os.path.join(os.path.dirname('__file__'),'results'))
         else:
             scraper = GoogleJobsScraper(jobtitle)
             jobs = scraper.fetch_jobs()
             scraper.output_to_csv(jobtitle,jobs)
+        
+        #Do the Post Processing to Output the Result to an Organized Excel Sheet
+
+
         #scraper.close_browser()

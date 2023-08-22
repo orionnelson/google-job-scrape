@@ -1,3 +1,5 @@
 selenium
 pandas
 pyperclip
+nltk
+openpyxl
