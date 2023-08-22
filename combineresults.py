@@ -106,15 +106,22 @@ def combine_csv_to_excel(folder_path):
             colors = generate_colors(len(files))
             colors_used = {}
             row_offsets = []
+            combined = pd.DataFrame()
 
             for file in files:
                 df = pd.read_csv(os.path.join(folder_path, file))
-                df.drop_duplicates(inplace=True)
-                frames.append(df)
-                row_offsets.append(len(df))
+                combined_temp = pd.concat([combined, df], ignore_index=True)
+                pre_drop_len = len(combined_temp)
+                combined_temp.drop_duplicates(inplace=True, subset=["Job Title", "Company", "Location"])
+                post_drop_len = len(combined_temp)
+                dropped_rows = pre_drop_len - post_drop_len
+                row_offsets.append(len(df) - dropped_rows)
+
+                combined = combined_temp
+
             
-            combined = pd.concat(frames, ignore_index=True)
-            combined.drop_duplicates(inplace=True)
+            #combined = pd.concat(frames, ignore_index=True)
+            #combined.drop_duplicates(inplace=True)
             combined.to_excel(writer, sheet_name=keyword, index=False, startrow=1)
             
             # Now, modify the cells for coloring
@@ -135,7 +142,6 @@ def combine_csv_to_excel(folder_path):
                 legend_cell.fill = PatternFill(start_color=color, end_color=color, fill_type="solid")
 
     return 'output.xlsx'
-
 
 
 if __name__ == '__main__':
